@@ -1,6 +1,6 @@
 // MIT License
 
-// Copyright (c) 2020 thanhphong98
+// Copyright (c) 2020 phonght32
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +92,7 @@ static void example_task(void* arg)
     mpu9250_cfg.dlpf_cfg =  MPU9250_DLPF;
     mpu9250_cfg.fs_sel = MPU9250_FS_RAGNE;
     mpu9250_cfg.sleep_mode = MPU9250_SLEEP_MODE;
-    mpu9250_cfg.i2c_num = I2C_NUM;
+    mpu9250_cfg.hw_info.i2c_num = I2C_NUM;
     mpu9250_cfg.if_protocol = MPU9250_IF_PROTOCOL;
     mpu9250_handle = mpu9250_init(&mpu9250_cfg);
 
