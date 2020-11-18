@@ -1,6 +1,11 @@
 #include "madgwick.h"
 
-#define MADGWICK_INIT_ERR_STR       "Madgwick AHRS init error"
+#define MADGWICK_INIT_ERR_STR           "Madgwick AHRS init error"
+#define MADGWICK_SET_BETA_ERR_STR       "Madgwick set beta error"
+#define MADGWICK_SET_SAMP_FREQ_ERR_STR  "Madgwick set sample frequency error"
+#define MADGWICK_GET_QUAT_ERR_STR       "Madgwick get quaternion error"
+#define MADGWICK_UPDATE_6DOF_ERR_STR    "Madgwick update 6DOF error"
+#define MADGWICK_UPDATE_9DOF_ERR_STR    "Madgwick update 9DOF error"
 
 static const char* MADGWICK_TAG = "MADGWICK AHRS";
 #define MADGWICK_CHECK(a, str, ret)  if(!(a)) {                                             \
@@ -57,32 +62,50 @@ madgwick_handle_t madgwick_init(madgwick_cfg_t *config)
     return handle;
 }
 
-void madgwick_set_beta(madgwick_handle_t handle, float beta)
+stm_err_t madgwick_set_beta(madgwick_handle_t handle, float beta)
 {
+    /* Check input conditions */
+    MADGWICK_CHECK(handle, MADGWICK_SET_BETA_ERR_STR, STM_ERR_INVALID_ARG);
+
     mutex_lock(handle->lock);
     handle->beta = beta;
     mutex_unlock(handle->lock);
+
+    return STM_OK;
 }
 
-void madgwick_set_sample_frequency(madgwick_handle_t handle, float sample_freq)
+stm_err_t madgwick_set_sample_frequency(madgwick_handle_t handle, float sample_freq)
 {
+    /* Check input conditions */
+    MADGWICK_CHECK(handle, MADGWICK_SET_SAMP_FREQ_ERR_STR, STM_ERR_INVALID_ARG);
+
     mutex_lock(handle->lock);
     handle->sample_freq = sample_freq;
     mutex_unlock(handle->lock);
+
+    return STM_OK;
 }
 
-void madgwick_get_quaternion(madgwick_handle_t handle, madgwick_quat_data_t *quat_data)
+stm_err_t madgwick_get_quaternion(madgwick_handle_t handle, madgwick_quat_data_t *quat_data)
 {
+    /* Check input conditions */
+    MADGWICK_CHECK(handle, MADGWICK_GET_QUAT_ERR_STR, STM_ERR_INVALID_ARG);
+
     mutex_lock(handle->lock);
     quat_data->q0 = handle->q0;
     quat_data->q1 = handle->q1;
     quat_data->q2 = handle->q2;
     quat_data->q3 = handle->q3;
     mutex_unlock(handle->lock);
+
+    return STM_OK;
 }
 
-void madgwick_update_6dof(madgwick_handle_t handle, float gx, float gy, float gz, float ax, float ay, float az) 
+stm_err_t madgwick_update_6dof(madgwick_handle_t handle, float gx, float gy, float gz, float ax, float ay, float az) 
 {
+    /* Check input conditions */
+    MADGWICK_CHECK(handle, MADGWICK_UPDATE_6DOF_ERR_STR, STM_ERR_INVALID_ARG);
+
     mutex_lock(handle->lock);
     
     float q0 = handle->q0;
@@ -163,10 +186,15 @@ void madgwick_update_6dof(madgwick_handle_t handle, float gx, float gy, float gz
     handle->q3 = q3;
 
     mutex_unlock(handle->lock);
+
+    return STM_OK;
 }
 
-void madgwick_update_9dof(madgwick_handle_t handle, float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz) 
+stm_err_t madgwick_update_9dof(madgwick_handle_t handle, float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz) 
 {
+    /* Check input conditions */
+    MADGWICK_CHECK(handle, MADGWICK_UPDATE_9DOF_ERR_STR, STM_ERR_INVALID_ARG);
+
     mutex_lock(handle->lock);
 
     float q0 = handle->q0;
@@ -184,7 +212,8 @@ void madgwick_update_9dof(madgwick_handle_t handle, float gx, float gy, float gz
     // Use IMU algorithm if magnetometer measurement invalid (avoids NaN in magnetometer normalisation)
     if ((mx == 0.0f) && (my == 0.0f) && (mz == 0.0f)) {
         madgwick_update_6dof(handle, gx, gy, gz, ax, ay, az);
-        return;
+        mutex_unlock(handle->lock);
+        return STM_OK;
     }
 
     // Rate of change of quaternion from gyroscope
@@ -275,4 +304,6 @@ void madgwick_update_9dof(madgwick_handle_t handle, float gx, float gy, float gz
     handle->q3 = q3;
 
     mutex_unlock(handle->lock);
+
+    return STM_OK;
 }

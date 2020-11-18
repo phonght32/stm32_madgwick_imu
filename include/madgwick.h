@@ -35,6 +35,7 @@ extern "C" {
 #include "freertos/semphr.h"
 #include "freertos/task.h"
 
+#include "stm_err.h"
 #include "stm_log.h"
 
 typedef struct madgwick *madgwick_handle_t;
@@ -64,25 +65,31 @@ madgwick_handle_t madgwick_init(madgwick_cfg_t *config);
  * @brief   Set beta value.
  * @param   handle Handle structure.
  * @param   beta Beta.
- * @return  None.
+ * @return
+ *      - STM_OK:   Success.
+ *      - Others: 	Fail.
  */
-void madgwick_set_beta(madgwick_handle_t handle, float beta);
+stm_err_t madgwick_set_beta(madgwick_handle_t handle, float beta);
 
 /*
  * @brief   Set sample frequency value.
  * @param   handle Handle structure.
  * @param   sample_freq Sample frequency.
- * @return  None.
+ * @return
+ *      - STM_OK:   Success.
+ *      - Others: 	Fail.
  */
-void madgwick_set_sample_frequency(madgwick_handle_t handle, float sample_freq);
+stm_err_t madgwick_set_sample_frequency(madgwick_handle_t handle, float sample_freq);
 
 /*
  * @brief   Get quaternion.
  * @param   handle Handle structure.
  * @param   quat_data Quaternion.
- * @return  None.
+ * @return
+ *      - STM_OK:   Success.
+ *      - Others: 	Fail.
  */
-void madgwick_get_quaternion(madgwick_handle_t handle, madgwick_quat_data_t *quat_data);
+stm_err_t madgwick_get_quaternion(madgwick_handle_t handle, madgwick_quat_data_t *quat_data);
 
 /*
  * @brief   Update Madgwick AHRS quaternion with 6 motions.
@@ -93,9 +100,11 @@ void madgwick_get_quaternion(madgwick_handle_t handle, madgwick_quat_data_t *qua
  * @param   ax Accelerometer along x axis.
  * @param   ay Accelerometer along y axis.
  * @param   az Accelerometer along z axis.
- * @return  None.
+ * @return
+ *      - STM_OK:   Success.
+ *      - Others: 	Fail.
  */
-void madgwick_update_6dof(madgwick_handle_t handle, float gx, float gy, float gz, float ax, float ay, float az);
+stm_err_t madgwick_update_6dof(madgwick_handle_t handle, float gx, float gy, float gz, float ax, float ay, float az);
 
 /*
  * @brief   Update Madgwick AHRS quaternion with 9 motions.
@@ -109,9 +118,12 @@ void madgwick_update_6dof(madgwick_handle_t handle, float gx, float gy, float gz
  * @param   mx Magnetometer along x axis.
  * @param   my Magnetometer along y axis.
  * @param   mz Magnetometer along z axis.
- * @return  None.
+ * @return
+ *      - STM_OK:   Success.
+ *      - Others: 	Fail.
  */
-void madgwick_update_9dof(madgwick_handle_t handle, float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
+stm_err_t madgwick_update_9dof(madgwick_handle_t handle, float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
+
 
 #ifdef __cplusplus 
 }
