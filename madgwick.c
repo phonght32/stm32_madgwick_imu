@@ -195,6 +195,12 @@ stm_err_t madgwick_update_9dof(madgwick_handle_t handle, float gx, float gy, flo
     /* Check input conditions */
     MADGWICK_CHECK(handle, MADGWICK_UPDATE_9DOF_ERR_STR, STM_ERR_INVALID_ARG);
 
+    // Use IMU algorithm if magnetometer measurement invalid (avoids NaN in magnetometer normalisation)
+    if ((mx == 0.0f) && (my == 0.0f) && (mz == 0.0f)) {
+        madgwick_update_6dof(handle, gx, gy, gz, ax, ay, az);
+        return STM_OK;
+    }
+
     mutex_lock(handle->lock);
 
     float q0 = handle->q0;
@@ -209,12 +215,7 @@ stm_err_t madgwick_update_9dof(madgwick_handle_t handle, float gx, float gy, flo
     float hx, hy;
     float _2q0mx, _2q0my, _2q0mz, _2q1mx, _2bx, _2bz, _4bx, _4bz, _2q0, _2q1, _2q2, _2q3, _2q0q2, _2q2q3, q0q0, q0q1, q0q2, q0q3, q1q1, q1q2, q1q3, q2q2, q2q3, q3q3;
 
-    // Use IMU algorithm if magnetometer measurement invalid (avoids NaN in magnetometer normalisation)
-    if ((mx == 0.0f) && (my == 0.0f) && (mz == 0.0f)) {
-        madgwick_update_6dof(handle, gx, gy, gz, ax, ay, az);
-        mutex_unlock(handle->lock);
-        return STM_OK;
-    }
+    
 
     // Rate of change of quaternion from gyroscope
     qDot1 = 0.5f * (-q1 * gx - q2 * gy - q3 * gz);
