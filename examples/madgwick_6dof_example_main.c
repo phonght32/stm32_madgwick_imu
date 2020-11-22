@@ -53,16 +53,16 @@
 
 #define DEG2RAD                 3.14f/180.0f
 
-#define I2C_NUM                 I2C_NUM_1
+#define I2C_NUM                 I2C_NUM_2
 #define I2C_PINS_PACK           I2C_PINS_PACK_1
 #define I2C_CLK_SPEED           400000
 
-#define MPU9250_AFS_RANGE       MPU9250_AFS_SEL_8G
-#define MPU9250_FS_RAGNE        MPU9250_FS_SEL_2000
-#define MPU9250_CLKSEL          MPU9250_CLKSEL_AUTO   
-#define MPU9250_DLPF            MPU9250_41ACEL_42GYRO_BW_HZ
-#define MPU9250_SLEEP_MODE      MPU9250_DISABLE_SLEEP_MODE
-#define MPU9250_IF_PROTOCOL     MPU9250_IF_I2C
+#define MPU9250_AFS_RANGE               MPU9250_AFS_SEL_8G
+#define MPU9250_FS_RAGNE                MPU9250_FS_SEL_2000
+#define MPU9250_CLKSEL                  MPU9250_CLKSEL_AUTO   
+#define MPU9250_DLPF                    MPU9250_41ACEL_42GYRO_BW_HZ
+#define MPU9250_SLEEP_MODE              MPU9250_DISABLE_SLEEP_MODE
+#define MPU9250_COMM_MODE_PROTOCOL      MPU9250_COMM_MODE_I2C
 
 #define MADGWICK_BETA           0.1f
 #define MADGWICK_SAMPLE_RATE    100.0f
@@ -78,12 +78,11 @@ static const char *TAG = "APP_MAIN";
 
 static void example_task(void* arg)
 {
-    /* Configure I2C driver */
-    i2c_cfg_t i2c_cfg;
-    i2c_cfg.i2c_num = I2C_NUM;
-    i2c_cfg.i2c_pins_pack = I2C_PINS_PACK;
-    i2c_cfg.clk_speed = I2C_CLK_SPEED;
-    i2c_config(&i2c_cfg);
+    mpu9250_hw_info_t mpu9250_hw_info = {
+        .i2c_num = I2C_NUM,
+        .i2c_pins_pack = I2C_PINS_PACK,
+        .i2c_speed = I2C_CLK_SPEED,
+    };
 
     /* Configure MPU9250 */
     mpu9250_cfg_t mpu9250_cfg;
@@ -92,8 +91,8 @@ static void example_task(void* arg)
     mpu9250_cfg.dlpf_cfg =  MPU9250_DLPF;
     mpu9250_cfg.fs_sel = MPU9250_FS_RAGNE;
     mpu9250_cfg.sleep_mode = MPU9250_SLEEP_MODE;
-    mpu9250_cfg.hw_info.i2c_num = I2C_NUM;
-    mpu9250_cfg.if_protocol = MPU9250_IF_PROTOCOL;
+    mpu9250_cfg.comm_mode = MPU9250_COMM_MODE_PROTOCOL;
+    mpu9250_cfg.hw_info = mpu9250_hw_info;
     mpu9250_handle = mpu9250_init(&mpu9250_cfg);
 
     /* Calibrate MPU9250 */
